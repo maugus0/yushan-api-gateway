@@ -1,0 +1,191 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      # Enable service discovery routing
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      # Global CORS Configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: false
+            max-age: 3600
+      
+      # Route Definitions
+      routes:
+        # ============================================
+        # USER SERVICE ROUTES
+        # ============================================
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<segment>.*), /auth/${segment}
+        
+        - id: user-service-users
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /users/${segment}
+        
+        - id: user-service-library
+          uri: lb://user-service
+          predicates:
+            - Path=/api/library/**
+          filters:
+            - RewritePath=/api/library/(?<segment>.*), /library/${segment}
+        
+        # ============================================
+        # CONTENT SERVICE ROUTES
+        # ============================================
+        - id: content-service-novels
+          uri: lb://content-service
+          predicates:
+            - Path=/api/novels/**
+          filters:
+            - RewritePath=/api/novels/(?<segment>.*), /novels/${segment}
+        
+        - id: content-service-chapters
+          uri: lb://content-service
+          predicates:
+            - Path=/api/chapters/**
+          filters:
+            - RewritePath=/api/chapters/(?<segment>.*), /chapters/${segment}
+        
+        - id: content-service-categories
+          uri: lb://content-service
+          predicates:
+            - Path=/api/categories/**
+          filters:
+            - RewritePath=/api/categories/(?<segment>.*), /categories/${segment}
+        
+        # ============================================
+        # ENGAGEMENT SERVICE ROUTES
+        # ============================================
+        - id: engagement-service-comments
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/comments/**
+          filters:
+            - RewritePath=/api/comments/(?<segment>.*), /comments/${segment}
+        
+        - id: engagement-service-reviews
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/reviews/**
+          filters:
+            - RewritePath=/api/reviews/(?<segment>.*), /reviews/${segment}
+        
+        - id: engagement-service-votes
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/votes/**
+          filters:
+            - RewritePath=/api/votes/(?<segment>.*), /votes/${segment}
+        
+        - id: engagement-service-reports
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - RewritePath=/api/reports/(?<segment>.*), /reports/${segment}
+        
+        # ============================================
+        # GAMIFICATION SERVICE ROUTES
+        # ============================================
+        - id: gamification-service-exp
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/exp/**
+          filters:
+            - RewritePath=/api/exp/(?<segment>.*), /exp/${segment}
+        
+        - id: gamification-service-yuan
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/yuan/**
+          filters:
+            - RewritePath=/api/yuan/(?<segment>.*), /yuan/${segment}
+        
+        - id: gamification-service-achievements
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/achievements/**
+          filters:
+            - RewritePath=/api/achievements/(?<segment>.*), /achievements/${segment}
+        
+        # ============================================
+        # ANALYTICS SERVICE ROUTES
+        # ============================================
+        - id: analytics-service-history
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/history/**
+          filters:
+            - RewritePath=/api/history/(?<segment>.*), /history/${segment}
+        
+        - id: analytics-service-rankings
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/rankings/**
+          filters:
+            - RewritePath=/api/rankings/(?<segment>.*), /rankings/${segment}
+        
+        - id: analytics-service-analytics
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - RewritePath=/api/analytics/(?<segment>.*), /analytics/${segment}
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+    com.yushan.gateway: DEBUG
+
+# JWT Configuration (match your User Service)
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-this-in-production-minimum-256-bits}
