@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  # Eureka Service Registry
+  eureka-server:
+    build:
+      context: ./yushan-platform-service-registry
+      dockerfile: Dockerfile
+    container_name: yushan-eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - yushan-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./yushan-api-gateway
+      dockerfile: Dockerfile
+    container_name: yushan-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-this-in-production}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # User Service
+  user-service:
+    build:
+      context: ./yushan-user-service
+      dockerfile: Dockerfile
+    container_name: yushan-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DATABASE_URL=${USER_DB_URL:-jdbc:postgresql://postgres:5432/yushan_users}
+      - DATABASE_USERNAME=${DB_USERNAME:-postgres}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-postgres}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+
+  # Content Service
+  content-service:
+    build:
+      context: ./yushan-content-service
+      dockerfile: Dockerfile
+    container_name: yushan-content-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DATABASE_URL=${CONTENT_DB_URL:-jdbc:postgresql://postgres:5432/yushan_content}
+      - DATABASE_USERNAME=${DB_USERNAME:-postgres}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-postgres}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./yushan-analytics-service
+      dockerfile: Dockerfile
+    container_name: yushan-analytics-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DATABASE_URL=${ANALYTICS_DB_URL:-jdbc:postgresql://postgres:5432/yushan_analytics}
+      - DATABASE_USERNAME=${DB_USERNAME:-postgres}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-postgres}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+
+  # Engagement Service
+  engagement-service:
+    build:
+      context: ./yushan-engagement-service
+      dockerfile: Dockerfile
+    container_name: yushan-engagement-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DATABASE_URL=${ENGAGEMENT_DB_URL:-jdbc:postgresql://postgres:5432/yushan_engagement}
+      - DATABASE_USERNAME=${DB_USERNAME:-postgres}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-postgres}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+
+  # Gamification Service
+  gamification-service:
+    build:
+      context: ./yushan-gamification-service
+      dockerfile: Dockerfile
+    container_name: yushan-gamification-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DATABASE_URL=${GAMIFICATION_DB_URL:-jdbc:postgresql://postgres:5432/yushan_gamification}
+      - DATABASE_USERNAME=${DB_USERNAME:-postgres}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-postgres}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - yushan-network
+
+  # PostgreSQL Database (optional - if you need it)
+  postgres:
+    image: postgres:15-alpine
+    container_name: yushan-postgres
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=yushan
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - yushan-network
+
+networks:
+  yushan-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
