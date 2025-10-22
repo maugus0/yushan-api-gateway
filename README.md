@@ -6,11 +6,11 @@ API Gateway and routing service for Yushan Novel Platform microservices architec
 
 - Single entry point for all microservices
 - Service discovery via Eureka
-- JWT-based authentication
 - Request/Response logging
 - CORS configuration
 - Health monitoring
 - Load balancing across service instances
+- Service routing and path rewriting
 
 ## Architecture
 
@@ -93,16 +93,12 @@ All requests go through `http://localhost:8080/api/*`
 
 ## Authentication
 
-Protected endpoints require a JWT token in the Authorization header:
-
-```bash
-Authorization: Bearer <your-jwt-token>
-```
+**Note**: JWT authentication is handled by individual microservices, not by the API Gateway. Each service validates JWT tokens independently.
 
 ### Getting a Token
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -113,17 +109,18 @@ curl -X POST http://localhost:8080/api/auth/login \
 ### Using the Token
 
 ```bash
-curl http://localhost:8080/api/users/1 \
+curl http://localhost:8080/api/v1/users/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
 ## Public Endpoints
 
-These endpoints do NOT require authentication:
-- `/api/auth/login`
-- `/api/auth/register`
-- `/api/auth/refresh`
-- `/api/novels` (browsing)
+These endpoints do NOT require authentication (handled by individual services):
+- `/api/v1/auth/login`
+- `/api/v1/auth/register`
+- `/api/v1/auth/refresh`
+- `/api/v1/novels` (browsing)
+- `/api/v1/categories` (browsing)
 - `/actuator/health`
 
 ## Health Check
@@ -147,7 +144,6 @@ curl http://localhost:8080/actuator/health
 |----------|-------------|---------|
 | `SERVER_PORT` | Gateway port | `8080` |
 | `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE` | Eureka server URL | `http://localhost:8761/eureka/` |
-| `JWT_SECRET` | JWT signing secret (min 256 bits) | (required) |
 
 ### application.yml
 
@@ -170,9 +166,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-
-jwt:
-  secret: ${JWT_SECRET}
 ```
 
 ## Docker
@@ -191,7 +184,6 @@ docker run -d \
   --name yushan-api-gateway \
   -p 8080:8080 \
   -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://host.docker.internal:8761/eureka/ \
-  -e JWT_SECRET=your-secret-key-change-this-in-production-minimum-256-bits \
   yushan-api-gateway:latest
 ```
 
@@ -220,7 +212,6 @@ services:
       - "8080:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - eureka-server
 ```
