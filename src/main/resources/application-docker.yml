@@ -1,0 +1,336 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      # Enable service discovery routing
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      # Global CORS Configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: false
+            max-age: 3600
+      
+      # Route Definitions - Updated to match actual service endpoints
+      routes:
+        # ============================================
+        # USER SERVICE ROUTES (Port 8081)
+        # ============================================
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - RewritePath=/api/v1/auth/(?<segment>.*), /api/v1/auth/${segment}
+        
+        - id: user-service-users
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - RewritePath=/api/v1/users/(?<segment>.*), /api/v1/users/${segment}
+        
+        - id: user-service-library
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/library/**
+          filters:
+            - RewritePath=/api/v1/library/(?<segment>.*), /api/v1/library/${segment}
+        
+        - id: user-service-admin
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/admin/**
+          filters:
+            - RewritePath=/api/v1/admin/(?<segment>.*), /api/v1/admin/${segment}
+        
+        - id: user-service-author
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/author/**
+          filters:
+            - RewritePath=/api/v1/author/(?<segment>.*), /api/v1/author/${segment}
+        
+        - id: user-service-public
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/public/**
+          filters:
+            - RewritePath=/api/v1/public/(?<segment>.*), /api/v1/public/${segment}
+        
+        # ============================================
+        # CONTENT SERVICE ROUTES (Port 8082)
+        # ============================================
+        - id: content-service-novels
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/novels/**
+          filters:
+            - RewritePath=/api/v1/novels/(?<segment>.*), /api/v1/novels/${segment}
+        
+        - id: content-service-chapters
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/chapters/**
+          filters:
+            - RewritePath=/api/v1/chapters/(?<segment>.*), /api/v1/chapters/${segment}
+        
+        - id: content-service-categories
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/categories/**
+          filters:
+            - RewritePath=/api/v1/categories/(?<segment>.*), /api/v1/categories/${segment}
+        
+        - id: content-service-search
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/search/**
+          filters:
+            - RewritePath=/api/v1/search/(?<segment>.*), /api/v1/search/${segment}
+        
+        - id: content-service-genres
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/genres/**
+          filters:
+            - RewritePath=/api/v1/genres/(?<segment>.*), /api/v1/genres/${segment}
+        
+        - id: content-service-tags
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/tags/**
+          filters:
+            - RewritePath=/api/v1/tags/(?<segment>.*), /api/v1/tags/${segment}
+        
+        - id: content-service-authors
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/authors/**
+          filters:
+            - RewritePath=/api/v1/authors/(?<segment>.*), /api/v1/authors/${segment}
+        
+        - id: content-service-collections
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/collections/**
+          filters:
+            - RewritePath=/api/v1/collections/(?<segment>.*), /api/v1/collections/${segment}
+        
+        - id: content-service-moderation
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/moderation/**
+          filters:
+            - RewritePath=/api/v1/moderation/(?<segment>.*), /api/v1/moderation/${segment}
+        
+        # ============================================
+        # ENGAGEMENT SERVICE ROUTES (Port 8084)
+        # ============================================
+        - id: engagement-service-comments
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/comments/**
+          filters:
+            - RewritePath=/api/v1/comments/(?<segment>.*), /api/v1/comments/${segment}
+        
+        - id: engagement-service-reviews
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/reviews/**
+          filters:
+            - RewritePath=/api/v1/reviews/(?<segment>.*), /api/v1/reviews/${segment}
+        
+        - id: engagement-service-ratings
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/ratings/**
+          filters:
+            - RewritePath=/api/v1/ratings/(?<segment>.*), /api/v1/ratings/${segment}
+        
+        - id: engagement-service-likes
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/likes/**
+          filters:
+            - RewritePath=/api/v1/likes/(?<segment>.*), /api/v1/likes/${segment}
+        
+        - id: engagement-service-bookmarks
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/bookmarks/**
+          filters:
+            - RewritePath=/api/v1/bookmarks/(?<segment>.*), /api/v1/bookmarks/${segment}
+        
+        - id: engagement-service-reading-progress
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/reading-progress/**
+          filters:
+            - RewritePath=/api/v1/reading-progress/(?<segment>.*), /api/v1/reading-progress/${segment}
+        
+        - id: engagement-service-follows
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/follows/**
+          filters:
+            - RewritePath=/api/v1/follows/(?<segment>.*), /api/v1/follows/${segment}
+        
+        - id: engagement-service-reading-lists
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/reading-lists/**
+          filters:
+            - RewritePath=/api/v1/reading-lists/(?<segment>.*), /api/v1/reading-lists/${segment}
+        
+        - id: engagement-service-notifications
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - RewritePath=/api/v1/notifications/(?<segment>.*), /api/v1/notifications/${segment}
+        
+        - id: engagement-service-recommendations
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/recommendations/**
+          filters:
+            - RewritePath=/api/v1/recommendations/(?<segment>.*), /api/v1/recommendations/${segment}
+        
+        - id: engagement-service-reports
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/reports/**
+          filters:
+            - RewritePath=/api/v1/reports/(?<segment>.*), /api/v1/reports/${segment}
+        
+        # ============================================
+        # GAMIFICATION SERVICE ROUTES (Port 8085)
+        # ============================================
+        - id: gamification-service-main
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/gamification/**
+          filters:
+            - RewritePath=/api/v1/gamification/(?<segment>.*), /api/v1/gamification/${segment}
+        
+        - id: gamification-service-achievements
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/achievements/**
+          filters:
+            - RewritePath=/api/v1/achievements/(?<segment>.*), /api/v1/achievements/${segment}
+        
+        - id: gamification-service-badges
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/badges/**
+          filters:
+            - RewritePath=/api/v1/badges/(?<segment>.*), /api/v1/badges/${segment}
+        
+        - id: gamification-service-points
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/points/**
+          filters:
+            - RewritePath=/api/v1/points/(?<segment>.*), /api/v1/points/${segment}
+        
+        - id: gamification-service-levels
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/levels/**
+          filters:
+            - RewritePath=/api/v1/levels/(?<segment>.*), /api/v1/levels/${segment}
+        
+        - id: gamification-service-leaderboards
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/leaderboards/**
+          filters:
+            - RewritePath=/api/v1/leaderboards/(?<segment>.*), /api/v1/leaderboards/${segment}
+        
+        - id: gamification-service-rewards
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/rewards/**
+          filters:
+            - RewritePath=/api/v1/rewards/(?<segment>.*), /api/v1/rewards/${segment}
+        
+        - id: gamification-service-streaks
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/streaks/**
+          filters:
+            - RewritePath=/api/v1/streaks/(?<segment>.*), /api/v1/streaks/${segment}
+        
+        - id: gamification-service-quests
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/quests/**
+          filters:
+            - RewritePath=/api/v1/quests/(?<segment>.*), /api/v1/quests/${segment}
+        
+        # ============================================
+        # ANALYTICS SERVICE ROUTES (Port 8083)
+        # ============================================
+        - id: analytics-service-history
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/history/**
+          filters:
+            - RewritePath=/api/history/(?<segment>.*), /api/history/${segment}
+        
+        - id: analytics-service-analytics
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/analytics/**
+          filters:
+            - RewritePath=/api/v1/analytics/(?<segment>.*), /api/v1/analytics/${segment}
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+    com.yushan.gateway: DEBUG
+
+# JWT Configuration removed - handled by individual services
