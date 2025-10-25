@@ -14,21 +14,15 @@ spring:
           lower-case-service-id: true
       
       # Global CORS Configuration - Disabled to avoid duplicate headers
-      # Using WebFlux CORS filter instead
-      # globalcors:
-      #   cors-configurations:
-      #     '[/**]':
-      #       allowed-origins: "*"
-      #       allowed-methods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      #         - PATCH
-      #         - OPTIONS
-      #       allowed-headers: "*"
-      #       allow-credentials: false
-      #       max-age: 3600
+      # Using Nginx CORS instead
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: []
+            allowed-methods: []
+            allowed-headers: []
+            allow-credentials: false
+            max-age: 0
       
       # Route Definitions - Updated to match actual service endpoints
       routes:
