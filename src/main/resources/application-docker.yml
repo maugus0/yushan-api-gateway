@@ -285,6 +285,13 @@ spring:
         # ============================================
         # ANALYTICS SERVICE ROUTES (Port 8083)
         # ============================================
+        - id: analytics-service-health
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/health
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
         - id: analytics-service-history
           uri: lb://analytics-service
           predicates:
@@ -297,7 +304,15 @@ spring:
           predicates:
             - Path=/api/v1/analytics/**
           filters:
-            - RewritePath=/api/v1/analytics/(?<segment>.*), /api/v1/analytics/${segment}
+            - RewritePath=/api/v1/analytics/(?<segment>.*), /api/v1/admin/analytics/${segment}
+        
+        - id: analytics-service-ranking
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/ranking/**
+          filters:
+            - RewritePath=/api/v1/ranking/(?<segment>.*), /api/v1/ranking/${segment}
+
 
 # Eureka Configuration
 eureka:
