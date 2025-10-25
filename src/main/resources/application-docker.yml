@@ -215,6 +215,13 @@ spring:
             - Path=/api/v1/reports/**
           filters:
             - RewritePath=/api/v1/reports/(?<segment>.*), /api/v1/reports/${segment}
+
+        - id: engagement-service-votes
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/votes/**
+          filters:
+            - RewritePath=/api/v1/votes/(?<segment>.*), /api/v1/votes/${segment}
         
         # ============================================
         # GAMIFICATION SERVICE ROUTES (Port 8085)
@@ -312,6 +319,43 @@ spring:
             - Path=/api/v1/ranking/**
           filters:
             - RewritePath=/api/v1/ranking/(?<segment>.*), /api/v1/ranking/${segment}
+        
+        # ============================================
+        # HEALTH ENDPOINTS (Service-specific)
+        # ============================================
+        
+        # Health endpoints for specific services (using query params)
+        - id: user-service-health
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/health
+            - Query=service,user-service
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
+        - id: content-service-health
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/health
+            - Query=service,content-service
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
+        - id: engagement-service-health
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/health
+            - Query=service,engagement-service
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
+        - id: gamification-service-health
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/health
+            - Query=service,gamification-service
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
 
 
 # Eureka Configuration
