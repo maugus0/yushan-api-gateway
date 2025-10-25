@@ -17,10 +17,12 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
-            allowed-methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+            allowed-origins:
+              - "https://maugus0.github.io"
+              - "http://localhost:3000"
+            allowed-methods: "*"
             allowed-headers: "*"
-            allow-credentials: false
+            allow-credentials: true
             max-age: 3600
       
       # Route Definitions - Updated to match actual service endpoints
