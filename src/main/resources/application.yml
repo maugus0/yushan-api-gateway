@@ -286,6 +286,13 @@ spring:
         # ============================================
         # ANALYTICS SERVICE ROUTES (Port 8083)
         # ============================================
+        - id: analytics-service-health
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/health
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
         - id: analytics-service-history
           uri: lb://analytics-service
           predicates:
