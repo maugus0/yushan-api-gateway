@@ -35,6 +35,42 @@ spring:
       # Route Definitions - Updated to match actual service endpoints
       routes:
         # ============================================
+        # ANALYTICS SERVICE ROUTES (Port 8083)
+        # ============================================
+
+        # Admin Analytics Routes
+        - id: analytics-service-admin-analytics
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/admin/analytics/**
+          filters:
+            - RewritePath=/api/v1/admin/analytics/(?<segment>.*), /api/v1/admin/analytics/${segment}
+
+        # History Routes
+        - id: analytics-service-history
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/history/**
+          filters:
+            - RewritePath=/api/v1/history/(?<segment>.*), /api/v1/history/${segment}
+
+        # Ranking Routes
+        - id: analytics-service-ranking
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/ranking/**
+          filters:
+            - RewritePath=/api/v1/ranking/(?<segment>.*), /api/v1/ranking/${segment}
+
+        # Analytics Service Health Endpoint
+        - id: analytics-service-health
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/health
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+
+        # ============================================
         # USER SERVICE ROUTES (Port 8081)
         # ============================================
         - id: user-service-auth
@@ -345,42 +381,6 @@ spring:
             - Path=/api/v1/analytics/actuator/**
           filters:
             - RewritePath=/api/v1/analytics/actuator/(?<segment>.*), /actuator/${segment}
-        
-        # ============================================
-        # ANALYTICS SERVICE ROUTES (Port 8083)
-        # ============================================
-        
-        # Admin Analytics Routes
-        - id: analytics-service-admin-analytics
-          uri: lb://analytics-service
-          predicates:
-            - Path=/api/v1/admin/analytics/**
-          filters:
-            - RewritePath=/api/v1/admin/analytics/(?<segment>.*), /api/v1/admin/analytics/${segment}
-        
-        # History Routes
-        - id: analytics-service-history
-          uri: lb://analytics-service
-          predicates:
-            - Path=/api/v1/history/**
-          filters:
-            - RewritePath=/api/v1/history/(?<segment>.*), /api/v1/history/${segment}
-        
-        # Ranking Routes
-        - id: analytics-service-ranking
-          uri: lb://analytics-service
-          predicates:
-            - Path=/api/v1/ranking/**
-          filters:
-            - RewritePath=/api/v1/ranking/(?<segment>.*), /api/v1/ranking/${segment}
-        
-        # Analytics Service Health Endpoint
-        - id: analytics-service-health
-          uri: lb://analytics-service
-          predicates:
-            - Path=/api/v1/health
-          filters:
-            - RewritePath=/api/v1/health, /api/v1/health
         
         # ============================================
         # HEALTH ENDPOINTS (Service-specific)
