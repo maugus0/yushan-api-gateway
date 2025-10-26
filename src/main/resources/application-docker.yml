@@ -14,13 +14,14 @@ spring:
           lower-case-service-id: true
       
       # Global CORS Configuration - Enable CORS in API Gateway
+      # Note: CORS is handled at the service level to allow credentials
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
+            allowedOriginPatterns: "*"  # Use pattern for dynamic origin matching
             allowed-methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
             allowed-headers: "*"
-            allow-credentials: false
+            allow-credentials: true  # Enable credentials for auth headers
             max-age: 3600
       
       # Route Definitions - Updated to match actual service endpoints
