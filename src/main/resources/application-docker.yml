@@ -17,12 +17,10 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins:
-              - "https://maugus0.github.io"
-              - "http://localhost:3000"
-            allowed-methods: "*"
+            allowed-origins: "*"
+            allowed-methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
             allowed-headers: "*"
-            allow-credentials: true
+            allow-credentials: false
             max-age: 3600
       
       # Route Definitions - Updated to match actual service endpoints
@@ -291,6 +289,54 @@ spring:
           filters:
             - RewritePath=/api/v1/quests/(?<segment>.*), /api/v1/quests/${segment}
         
+        # Gamification Service Actuator Endpoints
+        - id: gamification-service-actuator
+          uri: lb://gamification-service
+          predicates:
+            - Path=/api/v1/gamification/actuator/**
+          filters:
+            - RewritePath=/api/v1/gamification/actuator/(?<segment>.*), /actuator/${segment}
+        
+        # ============================================
+        # USER SERVICE ACTUATOR ROUTES
+        # ============================================
+        - id: user-service-actuator
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/user/actuator/**
+          filters:
+            - RewritePath=/api/v1/user/actuator/(?<segment>.*), /actuator/${segment}
+        
+        # ============================================
+        # CONTENT SERVICE ACTUATOR ROUTES
+        # ============================================
+        - id: content-service-actuator
+          uri: lb://content-service
+          predicates:
+            - Path=/api/v1/content/actuator/**
+          filters:
+            - RewritePath=/api/v1/content/actuator/(?<segment>.*), /actuator/${segment}
+        
+        # ============================================
+        # ENGAGEMENT SERVICE ACTUATOR ROUTES
+        # ============================================
+        - id: engagement-service-actuator
+          uri: lb://engagement-service
+          predicates:
+            - Path=/api/v1/engagement/actuator/**
+          filters:
+            - RewritePath=/api/v1/engagement/actuator/(?<segment>.*), /actuator/${segment}
+        
+        # ============================================
+        # ANALYTICS SERVICE ACTUATOR ROUTES
+        # ============================================
+        - id: analytics-service-actuator
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/analytics/actuator/**
+          filters:
+            - RewritePath=/api/v1/analytics/actuator/(?<segment>.*), /actuator/${segment}
+        
         # ============================================
         # ANALYTICS SERVICE ROUTES (Port 8083)
         # ============================================
@@ -356,6 +402,14 @@ spring:
           predicates:
             - Path=/api/v1/health
             - Query=service,gamification-service
+          filters:
+            - RewritePath=/api/v1/health, /api/v1/health
+        
+        - id: analytics-service-health
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/v1/health
+            - Query=service,analytics-service
           filters:
             - RewritePath=/api/v1/health, /api/v1/health
 
