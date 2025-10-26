@@ -13,17 +13,6 @@ spring:
           enabled: true
           lower-case-service-id: true
       
-      # Global CORS Configuration - Disabled to avoid duplicate headers
-      # Using Nginx CORS instead
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowed-origins: []
-            allowed-methods: []
-            allowed-headers: []
-            allow-credentials: false
-            max-age: 0
-      
       # Route Definitions - Updated to match actual service endpoints
       routes:
         # ============================================
